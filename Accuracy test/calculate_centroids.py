@@ -7,15 +7,26 @@ def read_dataset(filename):
         reader = csv.DictReader(file)
         data = []
         for row in reader:
-            row_data = {key: float(value) if key != 'Class' else value for key, value in row.items()}
+            row_data = {}
+            for key, value in row.items():
+                try:
+                    row_data[key] = float(value)
+                except ValueError:
+                    row_data[key] = value
             data.append(row_data)
         return data
 
-def calculate_centroids(data, dimensions):
+def determine_label_column(data):
+    for key in data[0].keys():
+        if not isinstance(data[0][key], float):
+            return key
+    return None
+
+def calculate_centroids(data, dimensions, label_column):
     label_to_points = {}
     
     for row in data:
-        label = row['Class']
+        label = row[label_column]
         if label not in label_to_points:
             label_to_points[label] = []
         label_to_points[label].append([row[dim] for dim in dimensions])
@@ -28,13 +39,18 @@ def calculate_centroids(data, dimensions):
 
 if __name__ == "__main__":
     start_time = time.time()
-    dataset = read_dataset('/Users/angelesmarin/Desktop/2Class_5D_dataset.csv')
+    dataset = read_dataset('/Users/angelesmarin/Desktop/2C_5D_dataset.csv')  
 
-    dimension_keys = [key for key in dataset[0].keys() if key != 'Class']
-    centroids = calculate_centroids(dataset, dimension_keys)
+    # dynamically determine label column
+    label_column = determine_label_column(dataset)
+    if label_column is None:
+        print("No label column found.")
+    else:
+        dimension_keys = [key for key in dataset[0].keys() if key != label_column]
+        centroids = calculate_centroids(dataset, dimension_keys, label_column)
 
-    print("Final Centroids:")
-    for label, centroid in centroids.items():
-        print(f"Label {label}: {centroid}")
+        print("Final Centroids:")
+        for label, centroid in centroids.items():
+            print(f"Label {label}: {centroid}")
 
-    print(f"Time taken (seconds): {time.time() - start_time}")
+        print(f"Time taken (seconds): {time.time() - start_time}")
