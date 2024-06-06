@@ -39,7 +39,7 @@ def calculate_centroids(data, dimensions, label_column):
 
 if __name__ == "__main__":
     start_time = time.time()
-    dataset = read_dataset('/Users/angelesmarin/Desktop/2C_5D_dataset.csv')  
+    dataset = read_dataset('/Users/angelesmarin/Desktop/IRIS.csv')  
 
     # dynamically determine label column
     label_column = determine_label_column(dataset)
@@ -51,6 +51,8 @@ if __name__ == "__main__":
 
         print("Final Centroids:")
         for label, centroid in centroids.items():
-            print(f"Label {label}: {centroid}")
+            print(f"Label {label}:")
+            for feature, value in zip(dimension_keys, centroid):
+                print(f"  {feature}: {value}")
 
         print(f"Time taken (seconds): {time.time() - start_time}")
